@@ -9,22 +9,22 @@ using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 
-namespace AzUnzipEverything
+namespace AnalyticsProcessor
 {
-    public static class Unzipthis
+    public static class ZipExtractor
     {
-        [FunctionName("Unzipthis")]
-        public static async Task Run([BlobTrigger("input-files/{name}", Connection = "cloud5mins_storage")]CloudBlockBlob myBlob, string name, ILogger log)
+        [FunctionName("ZipExtractor")]
+        public static async Task Run([BlobTrigger("analytics-zipped/{name}.zip", Connection = "analyticsStorage")]CloudBlockBlob myBlob, string name, ILogger log)
         {
             log.LogInformation($"C# Blob trigger function Processed blob\n Name:{name}");
 
-            string destinationStorage = Environment.GetEnvironmentVariable("destinationStorage");
+            string analyticsStorage = Environment.GetEnvironmentVariable("analyticsStorage");
             string destinationContainer = Environment.GetEnvironmentVariable("destinationContainer");
 
             try{
                 if(name.Split('.').Last().ToLower() == "zip"){
 
-                    CloudStorageAccount storageAccount = CloudStorageAccount.Parse(destinationStorage);
+                    CloudStorageAccount storageAccount = CloudStorageAccount.Parse(analyticsStorage);
                     CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
                     CloudBlobContainer container = blobClient.GetContainerReference(destinationContainer);
                     
@@ -53,7 +53,6 @@ namespace AzUnzipEverything
             }
             catch(Exception ex){
                 log.LogInformation($"Error! Something went wrong: {ex.Message}");
-
             }            
         }
     }
