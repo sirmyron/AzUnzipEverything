@@ -16,7 +16,7 @@ namespace AnalyticsProcessor
         [FunctionName("ZipExtractor")]
         public static async Task Run([BlobTrigger("analytics-zipped/{name}.zip", Connection = "analyticsStorage")]CloudBlockBlob myBlob, string name, ILogger log)
         {
-            log.LogInformation($"C# Blob trigger function Processed blob\n Name:{name}");
+            log.LogInformation($"Triggering function to extract:{name}");
 
             string analyticsStorage = Environment.GetEnvironmentVariable("analyticsStorage");
             string destinationContainer = Environment.GetEnvironmentVariable("destinationContainer");
@@ -30,6 +30,7 @@ namespace AnalyticsProcessor
                     
                     using(MemoryStream blobMemStream = new MemoryStream()){
 
+                        log.LogInformation($"Reading zip file to blob stream");
                         await myBlob.DownloadToStreamAsync(blobMemStream);
 
                         using(ZipArchive archive = new ZipArchive(blobMemStream))
@@ -40,6 +41,8 @@ namespace AnalyticsProcessor
 
                                 //Replace all NO digits, letters, or "-" by a "-" Azure storage is specific on valid characters
                                 string valideName = Regex.Replace(entry.Name,@"[^a-zA-Z0-9\-]","-").ToLower();
+
+                                log.LogInformation($"Writing processed file to unzipped container with name: {valideName}");
 
                                 CloudBlockBlob blockBlob = container.GetBlockBlobReference(valideName);
                                 using (var fileStream = entry.Open())
