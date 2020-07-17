@@ -3,13 +3,13 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "baseName": {
-            "value": "UnzipEverything"
+            "value": "AnalayticsProcessing"
         },
         "GitHubBranch": {
             "value": "master"
         },
-        "MonitorStorageName": {
-            "value": "dropzone"
+        "AnalyticsStorageName": {
+            "value": "analytics_storage"
         }
     }
 }

@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "baseName": {
-            "defaultValue": "UnzipEverything",
+            "defaultValue": "AnalayticsProcessing",
             "type": "string",
             "metadata": {
                 "description": "Name use as base-template to named the resources deployed in Azure."
@@ -16,11 +16,11 @@
                 "description": "Name of the branch to use when deploying (Default = master)."
             }
         },
-        "MonitorStorageName": {
+        "AnalyticsStorageName": {
             "type": "string",
-            "defaultValue": "dropzone",
+            "defaultValue": "analytics_storage",
             "metadata": {
-                 "description": "Name of the storage account where the files will be drop and unziped. (Default = dropzone)."
+                 "description": "Name of the storage account where the analytics zip files will be dropped and unzipped. (Default = analytics_storage)."
              }
          }
     },
@@ -29,8 +29,8 @@
         "funcAppName": "[toLower(concat(parameters('baseName'), variables('suffix')))]",
         "funcStorageName": "[tolower(concat(substring(parameters('baseName'), 0, min(length(parameters('baseName')),16)), 'stg', variables('suffix')))]",
         "serverFarmName": "[concat(substring(parameters('baseName'), 0, min(length(parameters('baseName')),14)), '-srv-', variables('suffix'))]",
-        "repoURL": "https://github.com/FBoucher/AzUnzipEverything.git",
-        "fileStorageName": "[tolower(concat(substring(parameters('MonitorStorageName'), 0, min(length(parameters('MonitorStorageName')),16)), 'stg', variables('suffix')))]"
+        "repoURL": "https://github.com/sirmyron/AzUnzipEverything.git",
+        "zipStorageName": "[tolower(concat(substring(parameters('AnalyticsStorageName'), 0, min(length(parameters('AnalyticsStorageName')),16)), 'stg', variables('suffix')))]"
     },
     "resources": [
         {
@@ -72,16 +72,16 @@
                             "value": "dotnet"
                         },
                         {
-                            "name": "cloud5mins_storage",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('fileStorageName'), ';AccountKey=', listKeys(variables('fileStorageName'),'2015-05-01-preview').key1)]"
+                            "name": "analyticsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('zipStorageName'), ';AccountKey=', listKeys(variables('zipStorageName'),'2015-05-01-preview').key1)]"
                         },
                         {
-                            "name": "destinationStorage",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('fileStorageName'), ';AccountKey=', listKeys(variables('fileStorageName'),'2015-05-01-preview').key1)]"
+                            "name": "sourceContainer",
+                            "value": "analytics-zipped"
                         },
                         {
                             "name": "destinationContainer",
-                            "value": "output-files"
+                            "value": "analytics-unzipped"
                         }
                     ]
                 }
@@ -133,10 +133,10 @@
         {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2018-07-01",
-            "name": "[variables('fileStorageName')]",
+            "name": "[variables('zipStorageName')]",
             "location": "[resourceGroup().location]",
             "tags": {
-                "displayName": "[variables('fileStorageName')]"
+                "displayName": "[variables('zipStorageName')]"
             },
             "sku": {
                 "name": "Standard_LRS"
@@ -146,9 +146,9 @@
                 {
                     "type": "blobServices/containers",
                     "apiVersion": "2018-07-01",
-                    "name": "[concat('default/', 'input-files')]",
+                    "name": "[concat('default/', 'analytics-zipped')]",
                     "dependsOn": [
-                        "[variables('fileStorageName')]"
+                        "[variables('zipStorageName')]"
                     ],
                     "properties": {
                         "publicAccess": "Blob"
@@ -157,9 +157,9 @@
                 {
                     "type": "blobServices/containers",
                     "apiVersion": "2018-07-01",
-                    "name": "[concat('default/', 'output-files')]",
+                    "name": "[concat('default/', 'analytics-unzipped')]",
                     "dependsOn": [
-                        "[variables('fileStorageName')]"
+                        "[variables('zipStorageName')]"
                     ],
                     "properties": {
                         "publicAccess": "Blob"
