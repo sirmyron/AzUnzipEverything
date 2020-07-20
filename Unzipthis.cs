@@ -16,7 +16,7 @@ namespace AzUnzipEverything
         [FunctionName("Unzipthis")]
         public static async Task Run([BlobTrigger("input-files/{name}", Connection = "cloud5mins_storage")]CloudBlockBlob myBlob, string name, ILogger log)
         {
-            log.LogInformation($"C# Blob trigger function Processed blob\n Name:{name}");
+            log.LogInformation($"Triggering function to extract:{name}");
 
             string destinationStorage = Environment.GetEnvironmentVariable("destinationStorage");
             string destinationContainer = Environment.GetEnvironmentVariable("destinationContainer");
@@ -30,6 +30,7 @@ namespace AzUnzipEverything
                     
                     using(MemoryStream blobMemStream = new MemoryStream()){
 
+                        log.LogInformation($"Reading zip file to blob stream");
                         await myBlob.DownloadToStreamAsync(blobMemStream);
 
                         using(ZipArchive archive = new ZipArchive(blobMemStream))
