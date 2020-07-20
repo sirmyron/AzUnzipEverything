@@ -40,9 +40,11 @@ namespace AzUnzipEverything
                                 log.LogInformation($"Now processing {entry.FullName}");
 
                                 //Replace all NO digits, letters, or "-" by a "-" Azure storage is specific on valid characters
-                                /*string valideName = Regex.Replace(entry.Name,@"[^a-zA-Z0-9\-]","-").ToLower();
+                                string valideName = Regex.Replace(entry.Name,@"[^a-zA-Z0-9\-]","-").ToLower();
 
-                                CloudBlockBlob blockBlob = container.GetBlockBlobReference(valideName);
+                                log.LogInformation($"Writing processed file to unzipped container with name: {valideName}");
+
+                                /*CloudBlockBlob blockBlob = container.GetBlockBlobReference(valideName);
                                 using (var fileStream = entry.Open())
                                 {
                                     await blockBlob.UploadFromStreamAsync(fileStream);
