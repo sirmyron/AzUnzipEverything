@@ -45,8 +45,8 @@ namespace AzUnzipEverything
                                 log.LogInformation($"Original name: {entry.Name}");
                                 log.LogInformation($"Writing processed file to unzipped container with name: {valideName}");
 
-                                /*CloudBlockBlob blockBlob = container.GetBlockBlobReference(valideName);
-                                using (var fileStream = entry.Open())
+                                CloudBlockBlob blockBlob = container.GetBlockBlobReference(valideName);
+                                /*using (var fileStream = entry.Open())
                                 {
                                     await blockBlob.UploadFromStreamAsync(fileStream);
                                 }*/
