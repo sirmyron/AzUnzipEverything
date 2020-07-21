@@ -38,7 +38,7 @@ namespace AzUnzipEverything
                             foreach (ZipArchiveEntry entry in archive.Entries)
                             {
                                 // Perform directory check
-                                if(!entry.FullName.EndsWith("//")) {
+                                if(!entry.FullName.EndsWith("/")) {
 
                                     log.LogInformation($"Now processing {entry.FullName}");
 
