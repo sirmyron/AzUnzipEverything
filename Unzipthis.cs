@@ -37,19 +37,26 @@ namespace AzUnzipEverything
                         {
                             foreach (ZipArchiveEntry entry in archive.Entries)
                             {
-                                log.LogInformation($"Now processing {entry.FullName}");
+                                // Perform directory check
+                                if(!entry.FullName.EndsWith("//")) {
 
-                                //Replace all NO digits, letters, or "-" by a "-" Azure storage is specific on valid characters
-                                string valideName = Regex.Replace(entry.Name,@"[^a-zA-Z0-9\-]","-").ToLower();
+                                    log.LogInformation($"Now processing {entry.FullName}");
 
-                                log.LogInformation($"Original name: {entry.Name}");
-                                log.LogInformation($"Writing processed file to unzipped container with name: {valideName}");
+                                    //Replace all NO digits, letters, or "-" by a "-" Azure storage is specific on valid characters
+                                    string valideName = Regex.Replace(entry.Name,@"[^a-zA-Z0-9\-]","-").ToLower();
 
-                                CloudBlockBlob blockBlob = container.GetBlockBlobReference(valideName);
-                                /*using (var fileStream = entry.Open())
-                                {
-                                    await blockBlob.UploadFromStreamAsync(fileStream);
-                                }*/
+                                    log.LogInformation($"Original name: {entry.Name}");
+                                    log.LogInformation($"Writing processed file to unzipped container with name: {valideName}");
+
+                                    CloudBlockBlob blockBlob = container.GetBlockBlobReference(valideName);
+                                    using (var fileStream = entry.Open())
+                                    {
+                                        await blockBlob.UploadFromStreamAsync(fileStream);
+                                    }
+                                }
+                                else {
+                                    log.LogInformation($"Ignoring directory: {entry.FullName}");
+                                }
                             }
                         }
                     }
